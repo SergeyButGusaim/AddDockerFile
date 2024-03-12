@@ -1,0 +1,29 @@
+Создание Dockerfile
+
+	FROM golang:1.21.0	// указываем версию GO
+
+	WORKDIR /usr/src/app	// рабочий каталог
+
+	COPY go.mod go.sum ./	// копирование файлов mod/sum
+
+	RUN go mod download	// загрузка go.mod/go.sum
+
+	COPY *.go ./		// копируем все файлы с расширение go
+
+	COPY tracker.db ./	// копируем "базу"
+
+	RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /parcels // из теории, копируем приложение
+
+	CMD ["/parcels"]	// команда для запуска, которую указали при сборке
+Собираем образ
+1. docker build --tag parcels:v1 .
+2. docker image ls				// проверка локальных образов 
+	(parcels  v1   3d8378fd527e 7 minutes ago 1.52GB)
+3. docker run -d parcels:v1			// тестирование образа 
+4. docker login -u Login -p Password 		// локальный вход Docker Hub
+5. docker build -t sergeybg/parcels:v1 .	// создание  Docker-образа
+6. docker run sergeybg/parcels:v1		// проверка созданного образа
+7. docker push sergeybg/parcels:v1		// пушим образ
+8. docker run -d sergeybg/parcels:v1		// повторный запуск
+	
+	
